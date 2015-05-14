@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 {% block body %}
-<ul>
-{% for metric, metric_urlsafe in metrics %}
-<li>
-<a href="/metric/{{ metric_urlsafe }}/">{{ metric }}</a>
-</li>
-{% endfor %}
-</ul>
+<div class="ui one column centered grid">
+	<div class="fifteen wide column">
+		<div class="ui horizontal menu">
+			<div class="item">
+				<div class="ui breadcrumb">
+					<div class="active section"><i class="home icon"></i> Index</div>
+				</div>
+			</div>
+		</div>
+		<ul>
+			{% for metric, metric_urlsafe in metrics %}
+			<li>
+				<a href="/metric/{{ metric_urlsafe }}/">{{ metric }}</a>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
 {% endblock %}

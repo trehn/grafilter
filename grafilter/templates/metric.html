@@ -1,30 +1,55 @@
 {% extends "base.html" %}
 {% block body %}
-<div id='chart'><svg></svg></div>
-<script type='text/javascript'>
-	nv.addGraph(function() {
-		var chart = nv.models.lineChart()
-		.showLegend(true)
-		;
+<div class="ui one column centered grid">
+	<div class="fifteen wide column">
+		<div class="ui horizontal menu">
+			<div class="item">
+				<div class="ui breadcrumb">
+					<a href="/" class="section"><i class="home icon"></i> Index</a>
+					<i class="right chevron icon divider"></i>
+					<div class="active section">{{ metric }}</div>
+				</div>
+			</div>
+			<div class="ui dropdown right item">
+				Timeframes
+				<i class="dropdown icon"></i>
+				<div class="menu">
+					<a class="item">1h</a>
+				</div>
+			</div>
+		</div>
 
-		chart.xAxis.tickFormat(function(d) {
-			return d3.time.format('%H:%M:%S')(new Date(d))
-		});
 
-		chart.xScale(d3.time.scale.utc());
+		<div id="chart"><svg></svg></div>
+		<script type="text/javascript">
+			nv.addGraph(function() {
+				var chart = nv.models.lineChart()
+				.showLegend(false)
+				;
 
-		var values = {{ values }};
-		var xy_values = [];
-		for (var i = 0, size = values.length; i < size; i++) {
-			xy_values.push({x: values[i][0], y: values[i][1]});
-		}
-		d3.select('#chart svg').datum([{
-			'key': '{{ metric }}',
-			'values': xy_values,
-		}]).call(chart);
+				chart.xAxis.tickFormat(function(d) {
+					return d3.time.format('%H:%M:%S')(new Date(d))
+				});
 
-		nv.utils.windowResize(function() { chart.update() });
-		return chart;
-	});
-</script>
+				chart.xScale(d3.time.scale.utc());
+
+				var values = {{ values }};
+				var xy_values = [];
+				for (var i = 0, size = values.length; i < size; i++) {
+					xy_values.push({x: values[i][0], y: values[i][1]});
+				}
+				d3.select('#chart svg').datum([{
+					'color': '#009FDA',
+					'key': '{{ metric }}',
+					'values': xy_values,
+				}]).call(chart);
+
+				nv.utils.windowResize(function() { chart.update() });
+				return chart;
+			});
+
+			$('.ui.dropdown').dropdown();
+		</script>
+	</div>
+</div>
 {% endblock %}
