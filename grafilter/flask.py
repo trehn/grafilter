@@ -3,10 +3,10 @@ from urllib.parse import quote_plus, unquote_plus
 
 from flask import Flask, render_template
 
-from influxdb import InfluxDBBackend
+from .influxdb import InfluxDBBackend
 
 app = Flask(__name__)
-app.config.from_pyfile("grafilter.cfg")
+app.config.from_envvar("GRAFILTER_SETTINGS")
 
 backend = InfluxDBBackend(app.config)
 

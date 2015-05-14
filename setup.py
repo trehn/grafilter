@@ -19,9 +19,15 @@ setup(
         "Topic :: System :: Networking :: Monitoring",
     ],
     description="Helps you explore and graph all your metrics as a supplement to dashboard solutions like Grafana",
+    entry_points={
+        'console_scripts': [
+            "grafilter=grafilter.cli:main",
+        ],
+    },
     include_package_data=True,
     install_requires=[
         "Flask",
+        "gunicorn",
         "requests >= 1.0.0",
     ],
     keywords=[
