@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/nvd3/1.7.1/nv.d3.min.js" charset="utf-8"></script>
+
+	<!-- the minified CSS actually produces different results from this one... -->
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/nvd3/1.7.1/nv.d3.css">
+	<style>
+		html, body, div#chart { height:100% }
+	</style>
+</head>
+<body>
+	<div id='chart'><svg></svg></div>
+	<script type='text/javascript'>
+		nv.addGraph(function() {
+			var chart = nv.models.lineChart()
+				.showLegend(true)
+				;
+
+			chart.xAxis.tickFormat(function(d) {
+				return d3.time.format('%H:%M:%S')(new Date(d))
+			});
+
+			chart.xScale(d3.time.scale.utc());
+
+			var values = {{ values }};
+			var xy_values = [];
+			for (var i = 0, size = values.length; i < size; i++) {
+				xy_values.push({x: values[i][0], y: values[i][1]});
+			}
+			d3.select('#chart svg').datum([{
+				'key': '{{ metric }}',
+				'values': xy_values,
+			}]).call(chart);
+
+			nv.utils.windowResize(function() { chart.update() });
+			return chart;
+		});
+	</script>
+</body>
+</html>

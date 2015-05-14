@@ -1,0 +1,9 @@
+include AUTHORS
+include CHANGELOG.md
+include LICENSE
+include MANIFEST.in
+include README.md
+recursive-include grafilter *.html
+recursive-exclude * .DS_Store
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
