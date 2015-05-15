@@ -22,7 +22,7 @@ class InfluxDBBackend(object):
             pass
         return sorted(series)
 
-    def metric(self, metric, period=None, start=None):
+    def metric(self, metric, period=None, resolution=80, start=None):
         if period is None:
             period = timedelta(3600)
         if start is not None:
@@ -37,14 +37,20 @@ class InfluxDBBackend(object):
             self._config['INFLUXDB_URL'] + "/db/" + self._config['INFLUXDB_DB'] + "/series",
             params={
                 'db': self._config['INFLUXDB_DB'],
-                'q': "SELECT value from \"{metric}\" WHERE {timespec}".format(
+                'q': "SELECT mean(value) from \"{metric}\" "
+                     "WHERE {timespec} GROUP BY time({tick}s)".format(
                     metric=metric,
                     timespec=timespec,
+                    tick=int(period.total_seconds() / resolution),
                 ),
             },
         )
         raw_points = response.json()[0]['points']
-        points = []
-        for time, sequence_number, value in raw_points:
-            points.append((time, value))
-        return points
+        data = {
+            'x': [],
+            metric: [],
+        }
+        for time, value in raw_points:
+            data['x'].append(time)
+            data[metric].append(value)
+        return data

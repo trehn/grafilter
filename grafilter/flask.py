@@ -1,11 +1,15 @@
 from datetime import datetime, timezone
-import json
 from urllib.parse import quote_plus, unquote_plus
 
-from flask import Flask, render_template
+from flask import Flask, jsonify, render_template, request
 from parsedatetime import Calendar
 
 from .influxdb import InfluxDBBackend
+
+
+DEFAULT_PERIOD = "1h"
+DEFAULT_RESOLUTION = 80
+
 
 app = Flask(__name__)
 app.config.from_envvar("GRAFILTER_SETTINGS")
@@ -13,6 +17,17 @@ app.config.from_envvar("GRAFILTER_SETTINGS")
 backend = InfluxDBBackend(app.config)
 
 calendar = Calendar()
+
+
+def get_request_arg(key, default):
+    try:
+        value = request.args[key]
+    except KeyError:
+        return default
+    if not value:
+        return default
+    else:
+        return value
 
 
 def quote(s):
@@ -26,7 +41,7 @@ def unquote(s):
 
 
 def parse_datetime(s):
-    if s is None:
+    if not s:
         return None
     return calendar.parseDT(s, sourceTime=datetime.now(timezone.utc), tzinfo=timezone.utc)[0]
 
@@ -48,21 +63,26 @@ def index():
 
 
 @app.route("/metric/<metric_urlsafe>/")
-@app.route("/metric/<metric_urlsafe>/<period>/")
-@app.route("/metric/<metric_urlsafe>/<period>/<start>/")
-def metric(metric_urlsafe, period="1h", start=None):
-    metric = unquote(metric_urlsafe)
+def metric(metric_urlsafe):
     return render_template(
         "metric.html",
-        metric=metric,
+        metric=unquote(metric_urlsafe),
         metric_urlsafe=metric_urlsafe,
-        start=start,
-        period=period,
-        values=json.dumps(backend.metric(
-            metric,
-            start=parse_datetime(start),
-            period=parse_timedelta(period),
-        )),
+        resolution=int(get_request_arg('resolution', 0)),
+        start=get_request_arg('start', None),
+        period=get_request_arg('period', None),
+    )
+
+
+@app.route("/metricdata/<metric_urlsafe>/")
+def metricdata(metric_urlsafe):
+    return jsonify(
+        **backend.metric(
+            unquote(metric_urlsafe),
+            resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
+            start=parse_datetime(get_request_arg('start', None)),
+            period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
+        )
     )
 
 

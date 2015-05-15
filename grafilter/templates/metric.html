@@ -3,76 +3,74 @@
 <div class="ui one column centered grid">
 	<div class="fifteen wide column">
 		<div class="ui horizontal menu">
-			<div class="item">
-				<div class="ui breadcrumb">
-					<a href="/" class="section"><i class="home icon"></i> Index</a>
-					<i class="right chevron icon divider"></i>
-					<div class="active section">{{ metric }}</div>
-				</div>
-			</div>
-			<div class="right menu">
+			<form id="menuform" method="GET">
 				<div class="item">
-					<div class="ui transparent icon input">
-						<input placeholder="Time period" type="text" id="period" name="period" class="menubarinput" value="{{ period or "" }}">
-						<i class="wait icon"></i>
+					<div class="ui breadcrumb">
+						<a href="/" class="section"><i class="home icon"></i> Index</a>
+						<i class="right chevron icon divider"></i>
+						<div class="active section">{{ metric }}</div>
 					</div>
 				</div>
-			</div>
-			<div class="right menu">
-				<div class="item">
-					<div class="ui transparent icon input">
-						<input placeholder="Start time (UTC)" type="text" id="start" name="start" class="menubarinput" value="{{ start or "" }}">
-						<i class="calendar icon"></i>
+				<div class="right menu">
+					<div class="item">
+						<div class="ui transparent icon input">
+							<input placeholder="Resolution (80)" type="text" id="resolution" name="resolution" class="menubarinput" value="{{ resolution or "" }}" autocomplete="off">
+							<i class="barcode icon"></i>
+						</div>
 					</div>
 				</div>
-			</div>
+				<div class="right menu">
+					<div class="item">
+						<div class="ui transparent icon input">
+							<input placeholder="Time period (1h)" type="text" id="period" name="period" class="menubarinput" value="{{ period or "" }}" autocomplete="off">
+							<i class="wait icon"></i>
+						</div>
+					</div>
+				</div>
+				<div class="right menu">
+					<div class="item">
+						<div class="ui transparent icon input">
+							<input placeholder="Starting time as UTC" type="text" id="start" name="start" class="menubarinput" value="{{ start or "" }}" autocomplete="off">
+							<i class="calendar icon"></i>
+						</div>
+					</div>
+				</div>
+			</form>
 		</div>
-
-		<div id="chart"><svg></svg></div>
+		<div id="c3chart" style="height: 600px"></div>
 		<script type="text/javascript">
-			$(function() {
-				$(".menubarinput").keypress(function(e) {
-					if(e.which == 10 || e.which == 13) {
-						e.preventDefault();
-						var next = "/metric/{{ metric_urlsafe }}/";
-						if ($("#period").val()) {
-							next = next + $("#period").val() + "/";
+			var chart = c3.generate({
+				bindto: '#c3chart',
+				data: {
+					x: 'x',
+					url: '/metricdata/{{ metric_urlsafe }}/' + location.search,
+					mimeType: 'json',
+					type: 'spline'
+				},
+				axis: {
+					x: {
+						type: 'timeseries',
+						tick: {
+							count: 5,
+							format: '%Y-%m-%d %H:%M:%S'
 						}
-						else {
-							next = next + "1h/";
-						}
-						if ($("#start").val()) {
-							next = next + $("#start").val() + "/";
-						}
-						window.location.href = next;
 					}
-				});
+				},
+				legend: {
+					hide: true
+				},
+				subchart: {
+					show: true
+				}
 			});
 
-			nv.addGraph(function() {
-				var chart = nv.models.lineChart()
-				.showLegend(false)
-				;
-
-				chart.xAxis.tickFormat(function(d) {
-					return d3.time.format('%H:%M:%S')(new Date(d))
+			$(function() {
+				$(".menubarinput").keypress(function(e) {
+					if (e.which == 10 || e.which == 13) {
+						e.preventDefault();
+						$("#menuform").submit();
+					}
 				});
-
-				chart.xScale(d3.time.scale.utc());
-
-				var values = {{ values }};
-				var xy_values = [];
-				for (var i = 0, size = values.length; i < size; i++) {
-					xy_values.push({x: values[i][0], y: values[i][1]});
-				}
-				d3.select('#chart svg').datum([{
-					'color': '#009FDA',
-					'key': '{{ metric }}',
-					'values': xy_values,
-				}]).call(chart);
-
-				nv.utils.windowResize(function() { chart.update() });
-				return chart;
 			});
 		</script>
 	</div>
