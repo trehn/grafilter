@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import requests
 
 
@@ -20,14 +22,24 @@ class InfluxDBBackend(object):
             pass
         return sorted(series)
 
-    def metric(self, metric, timeframe="1h"):
+    def metric(self, metric, period=None, start=None):
+        if period is None:
+            period = timedelta(3600)
+        if start is not None:
+            end = start + period
+            timespec = "time > '{start}' AND time < '{end}'".format(
+                end=end.strftime("%Y-%m-%d %H:%M:%S"),
+                start=start.strftime("%Y-%m-%d %H:%M:%S"),
+            )
+        else:
+            timespec = "time > now() - {}s".format(int(period.total_seconds()))
         response = requests.get(
             self._config['INFLUXDB_URL'] + "/db/" + self._config['INFLUXDB_DB'] + "/series",
             params={
                 'db': self._config['INFLUXDB_DB'],
-                'q': "SELECT value from \"{metric}\" WHERE time > now() - {timeframe}".format(
+                'q': "SELECT value from \"{metric}\" WHERE {timespec}".format(
                     metric=metric,
-                    timeframe=timeframe,
+                    timespec=timespec,
                 ),
             },
         )

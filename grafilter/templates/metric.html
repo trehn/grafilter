@@ -10,18 +10,45 @@
 					<div class="active section">{{ metric }}</div>
 				</div>
 			</div>
-			<div class="ui dropdown right item">
-				Timeframes
-				<i class="dropdown icon"></i>
-				<div class="menu">
-					<a class="item">1h</a>
+			<div class="right menu">
+				<div class="item">
+					<div class="ui transparent icon input">
+						<input placeholder="Time period" type="text" id="period" name="period" class="menubarinput" value="{{ period or "" }}">
+						<i class="wait icon"></i>
+					</div>
+				</div>
+			</div>
+			<div class="right menu">
+				<div class="item">
+					<div class="ui transparent icon input">
+						<input placeholder="Start time (UTC)" type="text" id="start" name="start" class="menubarinput" value="{{ start or "" }}">
+						<i class="calendar icon"></i>
+					</div>
 				</div>
 			</div>
 		</div>
 
-
 		<div id="chart"><svg></svg></div>
 		<script type="text/javascript">
+			$(function() {
+				$(".menubarinput").keypress(function(e) {
+					if(e.which == 10 || e.which == 13) {
+						e.preventDefault();
+						var next = "/metric/{{ metric_urlsafe }}/";
+						if ($("#period").val()) {
+							next = next + $("#period").val() + "/";
+						}
+						else {
+							next = next + "1h/";
+						}
+						if ($("#start").val()) {
+							next = next + $("#start").val() + "/";
+						}
+						window.location.href = next;
+					}
+				});
+			});
+
 			nv.addGraph(function() {
 				var chart = nv.models.lineChart()
 				.showLegend(false)
@@ -47,8 +74,6 @@
 				nv.utils.windowResize(function() { chart.update() });
 				return chart;
 			});
-
-			$('.ui.dropdown').dropdown();
 		</script>
 	</div>
 </div>

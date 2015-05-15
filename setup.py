@@ -28,6 +28,7 @@ setup(
     install_requires=[
         "Flask",
         "gunicorn",
+        "parsedatetime >= 1.4",
         "requests >= 1.0.0",
     ],
     keywords=[
