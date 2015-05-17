@@ -8,14 +8,62 @@
 					<div class="active section"><i class="home icon"></i></div>
 				</div>
 			</div>
+			<div class="item right">
+				grafilter 0.1.0
+			</div>
 		</div>
-		<ul>
-			{% for metric, metric_urlsafe in metrics %}
-			<li>
-				<a href="/metric/{{ metric_urlsafe }}/">{{ metric }}</a>
-			</li>
-			{% endfor %}
-		</ul>
+		<div class="ui segment">
+			<div class="ui massive transparent fluid action icon input">
+				<input placeholder="Search...    (press return to show all)" type="text" id="search">
+				<i class="search icon"></i>
+			</div>
+		</div>
+		<div id="results">
+		</div>
 	</div>
 </div>
+<script>
+	$(document).ready(function() {
+		bloodhound = new Bloodhound({
+			datumTokenizer: function(d) {
+				return Bloodhound.tokenizers.whitespace(d.val);
+			},
+			limit: 100,
+			queryTokenizer: Bloodhound.tokenizers.whitespace,
+			remote: {
+				url: '/search?q=%QUERY',
+				wildcard: '%QUERY',
+			},
+		});
+
+		function display_results(datums) {
+			if (datums.length >= 1) {
+				var output = "<table class='ui compact table'>";
+				datums.map(function(datum) {
+					output += "<tr><td>";
+					output += "<a href='/metric/" + datum.name_urlsafe + "/'>";
+					output += datum.name + "</a></td></tr>";
+				})
+				output += "</table>";
+				$("#results").html(output);
+			}
+			else {
+				$("#results").html("Nothing found.");
+			}
+		}
+
+		$("#search").keyup(function(event) {
+			query = $("#search").val();
+			if (query.length > 1 || event.which == 13) {
+				bloodhound.search(query, function(d){}, display_results);
+			}
+			else if (query.length <= 1 && event.which == 8) {
+				$("#results").html("");
+			}
+		});
+
+
+		$('#search').select();
+	});
+</script>
 {% endblock %}

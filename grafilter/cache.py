@@ -1,4 +1,7 @@
+from .utils import quote
+
+
 def build_cache(backend, config_dir):
     return {
-        'metrics': backend.metrics(),
+        'metrics': [(metric, quote(metric)) for metric in backend.metrics()],
     }

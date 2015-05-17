@@ -1,12 +1,11 @@
-from datetime import datetime, timezone
-from urllib.parse import quote_plus, unquote_plus
+import json
 
-from flask import Flask, jsonify, render_template, request
-from parsedatetime import Calendar
+from flask import Flask, jsonify, render_template, request, Response
 
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
+from .utils import parse_datetime, parse_timedelta, search_string, unquote
 
 
 DEFAULT_PERIOD = "1h"
@@ -22,7 +21,6 @@ cache = Cache(
     build_cache,
     (backend, app.config['CONFIG_DIR']),
 )
-calendar = Calendar()
 
 
 def get_request_arg(key, default):
@@ -36,38 +34,9 @@ def get_request_arg(key, default):
         return value
 
 
-def quote(s):
-    # https://github.com/mitsuhiko/flask/issues/900
-    # http://www.leakon.com/archives/865
-    return quote_plus(quote_plus(s))
-
-
-def unquote(s):
-    return unquote_plus(unquote_plus(s))
-
-
-def parse_datetime(s):
-    if not s:
-        return None
-    return calendar.parseDT(s, sourceTime=datetime.now(timezone.utc), tzinfo=timezone.utc)[0]
-
-
-def parse_timedelta(s):
-    return calendar.parseDT(
-        s,
-        sourceTime=datetime.now(timezone.utc),
-        tzinfo=timezone.utc,
-    )[0] - datetime.now(timezone.utc)
-
-
 @app.route("/")
 def index():
-    with cache.lock:
-        metrics = cache['metrics']
-    return render_template(
-        "index.html",
-        metrics=[(metric, quote(metric)) for metric in metrics],
-    )
+    return render_template("index.html")
 
 
 @app.route("/metric/<metric_urlsafe>/")
@@ -83,7 +52,7 @@ def metric(metric_urlsafe):
 
 
 @app.route("/metricdata/<metric_urlsafe>/")
-def metricdata(metric_urlsafe):
+def metric_data(metric_urlsafe):
     return jsonify(
         **backend.metric(
             unquote(metric_urlsafe),
@@ -92,6 +61,18 @@ def metricdata(metric_urlsafe):
             period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
         )
     )
+
+
+@app.route("/search")
+def metric_search():
+    query = request.args.get("q", "")
+    result = []
+    with cache.lock:
+        metrics = cache['metrics']
+    for metric, metric_urlsafe in metrics:
+        if search_string(query, metric):
+            result.append({'name': metric, 'name_urlsafe': metric_urlsafe})
+    return Response(json.dumps(result), mimetype="application/json")
 
 
 if __name__ == "__main__":
