@@ -57,7 +57,7 @@
 			if (query.length > 1 || event.which == 13) {
 				bloodhound.search(query, function(d){}, display_results);
 			}
-			else if (query.length <= 1 && event.which == 8) {
+			else if (query.length <= 1) {
 				$("#results").html("");
 			}
 		});
