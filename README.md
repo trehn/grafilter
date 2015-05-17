@@ -15,6 +15,8 @@ Configure
 Create a file with these contents anywhere:
 
 	DEBUG = False
+	CACHE_TIMEOUT = 300
+	CONFIG_DIR = "/var/lib/grafilter"
 	INFLUXDB_URL = "http://user:pass@influxdb.example.com:8086"
 	INFLUXDB_DB = "metrics"
 

@@ -4,6 +4,8 @@ from urllib.parse import quote_plus, unquote_plus
 from flask import Flask, jsonify, render_template, request
 from parsedatetime import Calendar
 
+from .background import Cache
+from .cache import build_cache
 from .influxdb import InfluxDBBackend
 
 
@@ -15,7 +17,11 @@ app = Flask(__name__)
 app.config.from_envvar("GRAFILTER_SETTINGS")
 
 backend = InfluxDBBackend(app.config)
-
+cache = Cache(
+    app.config['CACHE_TIMEOUT'],
+    build_cache,
+    (backend, app.config['CONFIG_DIR']),
+)
 calendar = Calendar()
 
 
@@ -56,9 +62,11 @@ def parse_timedelta(s):
 
 @app.route("/")
 def index():
+    with cache.lock:
+        metrics = cache['metrics']
     return render_template(
         "index.html",
-        metrics=[(metric, quote(metric)) for metric in backend.metrics()],
+        metrics=[(metric, quote(metric)) for metric in metrics],
     )
 
 
