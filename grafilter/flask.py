@@ -34,6 +34,17 @@ def get_request_arg(key, default):
         return value
 
 
+def get_metric_style(metric):
+    with cache.lock:
+        styles = cache['styles']
+    style = {}
+    for pattern, style_candidate in styles.items():
+        if pattern.search(metric) is not None:
+            style = style_candidate
+            break
+    return style
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -41,24 +52,30 @@ def index():
 
 @app.route("/metric/<metric_urlsafe>/")
 def metric(metric_urlsafe):
+    metric = unquote(metric_urlsafe)
+    style = get_metric_style(metric)
     return render_template(
         "metric.html",
-        metric=unquote(metric_urlsafe),
+        metric=metric,
         metric_urlsafe=metric_urlsafe,
+        period=get_request_arg('period', None),
         resolution=int(get_request_arg('resolution', 0)),
         start=get_request_arg('start', None),
-        period=get_request_arg('period', None),
+        style=style,
     )
 
 
 @app.route("/metricdata/<metric_urlsafe>/")
 def metric_data(metric_urlsafe):
+    metric = unquote(metric_urlsafe)
+    style = get_metric_style(metric)
     return jsonify(
         **backend.metric(
-            unquote(metric_urlsafe),
+            metric,
+            period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
             resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
             start=parse_datetime(get_request_arg('start', None)),
-            period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
+            transform=style.get('transform', None),
         )
     )
 
@@ -69,9 +86,13 @@ def metric_search():
     result = []
     with cache.lock:
         metrics = cache['metrics']
-    for metric, metric_urlsafe in metrics:
+    for metric, metric_properties in metrics.items():
         if search_string(query, metric):
-            result.append({'name': metric, 'name_urlsafe': metric_urlsafe})
+            result.append({
+                'name': metric,
+                'name_urlsafe': metric_properties['name_urlsafe'],
+                'styled': metric_properties['styled'],
+            })
     return Response(json.dumps(result), mimetype="application/json")
 
 

@@ -32,3 +32,23 @@ Run
 ```sh
 GRAFILTER_SETTINGS=/path/to/grafilter.cfg grafilter
 ```
+
+Customize
+---------
+
+You can customize the appearance of your individual metrics by placing files in the `metrics` subdirectory of your `CONFIG_DIR`. These files must have a `.json` extension and look like this:
+
+```json
+{
+	"pattern": "\\.load$",
+	"transform": "lambda x: math.floor(x)",
+	"type": "area"
+}
+```
+
+Note that `pattern` is a regular expression that has to match the name of the metrics you want to customize. Each metric will only be styled according to the first file with a matching `pattern`. All other options listed here are optional.
+
+Option | Explanation
+-------|------------
+`transform` | a Python expression describing a function that takes a numeric value and returns another. It can be used to perform conversions and other math on your metrics. You have access to the [math module from the Python standard library](https://docs.python.org/3/library/math.html).
+`type` | `area`, `area-spline`, `area-step`, `line`, `spline` or `step` (defaults to `line`)

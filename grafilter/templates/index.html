@@ -40,7 +40,11 @@
 			if (datums.length >= 1) {
 				var output = "<table class='ui compact table'>";
 				datums.map(function(datum) {
-					output += "<tr><td>";
+					output += "<tr><td class='collapsing'>";
+					if (datum.styled) {
+						output += "<div class='ui circular label' title='Styled'>S</div>";
+					}
+					output += "</td><td>";
 					output += "<a href='/metric/" + datum.name_urlsafe + "/'>";
 					output += datum.name + "</a></td></tr>";
 				})

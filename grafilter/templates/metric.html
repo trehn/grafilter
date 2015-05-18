@@ -45,7 +45,7 @@
 					x: 'x',
 					url: '/metricdata/{{ metric_urlsafe }}/' + location.search,
 					mimeType: 'json',
-					type: 'spline'
+					type: '{{ style.get('type', 'line') }}'
 				},
 				axis: {
 					x: {

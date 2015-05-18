@@ -22,7 +22,7 @@ class InfluxDBBackend(object):
             pass
         return sorted(series)
 
-    def metric(self, metric, period=None, resolution=80, start=None):
+    def metric(self, metric, period=None, resolution=80, start=None, transform=None):
         if period is None:
             period = timedelta(3600)
         if start is not None:
@@ -52,5 +52,8 @@ class InfluxDBBackend(object):
         }
         for time, value in raw_points:
             data['x'].append(time)
-            data[metric].append(value)
+            if transform is None:
+                data[metric].append(value)
+            else:
+                data[metric].append(transform(value))
         return data
