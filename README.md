@@ -50,5 +50,9 @@ Note that `pattern` is a regular expression that has to match the name of the me
 
 Option | Explanation
 -------|------------
+`max` | force highest value on y axis (int or float)
+`min` | force lowest value on y axis (int or float)
 `transform` | a Python expression describing a function that takes a numeric value and returns another. It can be used to perform conversions and other math on your metrics. You have access to the [math module from the Python standard library](https://docs.python.org/3/library/math.html).
-`type` | `area`, `area-spline`, `area-step`, `line`, `spline` or `step` (defaults to `line`)
+`type` | chart type: `area`, `area-spline`, `area-step`, `line`, `spline` or `step` (defaults to `line`)
+`unit_format` | a [d3 format specifier](https://github.com/mbostock/d3/wiki/Formatting#d3_format) for your y axis (e.g. "s" to turn "1000" into "1K" and "1000000" into "1M")
+`unit` | any string you want to be displayed next to your y axis

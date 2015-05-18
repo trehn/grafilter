@@ -54,6 +54,12 @@
 							count: 5,
 							format: '%Y-%m-%d %H:%M:%S'
 						}
+					},
+					y : {
+						{% if 'max' in style %}max: {{ style["max"] }},{% endif %}
+						{% if 'min' in style %}min: {{ style["min"] }},{% endif %}
+						{% if 'unit' in style %}label: {text: '{{ style["unit"] }}', position: 'outer-middle'},{% endif %}
+						{% if 'unit_format' in style %}tick: {format: d3.format('{{ style["unit_format"] }}')},{% endif %}
 					}
 				},
 				legend: {
