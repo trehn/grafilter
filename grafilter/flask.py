@@ -5,7 +5,7 @@ from flask import Flask, jsonify, render_template, request, Response
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
-from .utils import parse_datetime, parse_timedelta, search_string, unquote
+from .utils import parse_datetime, parse_timedelta, quote, search_string, unquote
 
 
 DEFAULT_PERIOD = "1h"
@@ -53,6 +53,8 @@ def index():
 @app.route("/metric/<metric_urlsafe>/")
 def metric(metric_urlsafe):
     metric = unquote(metric_urlsafe)
+    # one level of quoting got removed by Flask
+    metric_urlsafe = quote(metric)
     style = get_metric_style(metric)
     return render_template(
         "metric.html",
