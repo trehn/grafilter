@@ -72,6 +72,7 @@ def metric_data(metric_urlsafe):
     return jsonify(
         **backend.metric(
             metric,
+            display_name=style.get('short_name', metric),
             period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
             resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
             start=parse_datetime(get_request_arg('start', None)),

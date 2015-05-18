@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ metric }}{% if "short_name" in style %}   ({{ style["short_name"] }}){% endif %}{% endblock %}
 {% block body %}
 <div class="ui one column centered padded grid">
 	<div class="fifteen wide column">
@@ -8,7 +9,7 @@
 					<div class="ui breadcrumb">
 						<a href="/" class="section"><i class="home icon"></i></a>
 						<i class="right chevron icon divider"></i>
-						<div class="active section">{{ metric }}</div>
+						<div class="active section">{{ metric }}{% if "short_name" in style %} &nbsp; ({{ style["short_name"] }}){% endif %}</div>
 					</div>
 				</div>
 				<div class="right menu">
