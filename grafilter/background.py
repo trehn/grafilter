@@ -11,7 +11,7 @@ class Cache(dict):
         self.update_interval = update_interval
 
         self.update_cache()
-        atexit.register(self.cleanup, (self,))
+        atexit.register(self.cleanup)
 
     def update_cache(self):
         new_cache = self.update_func(*self.args)
