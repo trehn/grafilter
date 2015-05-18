@@ -18,7 +18,7 @@ class Cache(dict):
         with self.lock:
             self.clear()
             self.update(new_cache)
-        self.thread = Timer(self.update_interval, self.update, (self,))
+        self.thread = Timer(self.update_interval, self.update_cache)
         self.thread.start()
 
     def cleanup(self):
