@@ -6,23 +6,29 @@ Dashboards like [Grafana](http://grafana.org) are awesome, but sometimes they ma
 Install
 -------
 
-	apt-get install python3-pip
-	pip3 install grafilter
+```
+apt-get install python3-pip
+pip3 install grafilter
+```
 
 Configure
 ---------
 
 Create a file with these contents anywhere:
 
-	DEBUG = False
-	CACHE_TIMEOUT = 300
-	CONFIG_DIR = "/var/lib/grafilter"
-	INFLUXDB_URL = "http://user:pass@influxdb.example.com:8086"
-	INFLUXDB_DB = "metrics"
+```python
+DEBUG = False
+CACHE_TIMEOUT = 300
+CONFIG_DIR = "/var/lib/grafilter"
+INFLUXDB_URL = "http://user:pass@influxdb.example.com:8086"
+INFLUXDB_DB = "metrics"
+```
 
 Note that `INFLUXDB_URL` points to the HTTP API port of InfluxDB.
 
 Run
 ---
 
-	GRAFILTER_SETTINGS=/path/to/grafilter.cfg grafilter
+```sh
+GRAFILTER_SETTINGS=/path/to/grafilter.cfg grafilter
+```
