@@ -15,7 +15,7 @@
 				<div class="right menu">
 					<div class="item">
 						<div class="ui transparent icon input">
-							<input placeholder="Resolution (80)" type="text" id="resolution" name="resolution" class="menubarinput" value="{{ resolution or "" }}" autocomplete="off">
+							<input placeholder="Resolution (80)" type="text" tabindex="3" id="resolution" name="resolution" class="menubarinput" value="{{ resolution or "" }}" autocomplete="off">
 							<i class="barcode icon"></i>
 						</div>
 					</div>
@@ -23,7 +23,7 @@
 				<div class="right menu">
 					<div class="item">
 						<div class="ui transparent icon input">
-							<input placeholder="Time period (1h)" type="text" id="period" name="period" class="menubarinput" value="{{ period or "" }}" autocomplete="off">
+							<input placeholder="Time period (1h)" type="text" tabindex="2" id="period" name="period" class="menubarinput" value="{{ period or "" }}" autocomplete="off">
 							<i class="wait icon"></i>
 						</div>
 					</div>
@@ -31,7 +31,7 @@
 				<div class="right menu">
 					<div class="item">
 						<div class="ui transparent icon input">
-							<input placeholder="Starting time as UTC" type="text" id="start" name="start" class="menubarinput" value="{{ start or "" }}" autocomplete="off">
+							<input placeholder="Starting time as UTC" type="text" tabindex="1" id="start" name="start" class="menubarinput" value="{{ start or "" }}" autocomplete="off">
 							<i class="calendar icon"></i>
 						</div>
 					</div>
