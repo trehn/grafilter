@@ -59,7 +59,7 @@ class InfluxDBBackend(object):
 
         tag_filter = ""
         for key, value in tags.items():
-            tag_filter += " and {} = '{}'".format(key, value)
+            tag_filter += " and \"{}\" = '{}'".format(key, value)
 
         response = requests.get(
             self._config['INFLUXDB_URL'] + "/query",

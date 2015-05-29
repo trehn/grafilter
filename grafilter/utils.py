@@ -46,7 +46,7 @@ def parse_id(metric_id):
     This is the reverse of build_id().
     """
     tokens = metric_id.split("/")
-    base_name = tokens.pop(0)
+    base_name = unquote(tokens.pop(0))
     tags = {}
     for token in tokens:
         key, value = token.split(":", 1)

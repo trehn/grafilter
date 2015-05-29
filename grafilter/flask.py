@@ -1,11 +1,12 @@
 import json
+from urllib.parse import quote as no_slash_quote
 
 from flask import Flask, jsonify, render_template, request, Response
 
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
-from .utils import parse_datetime, parse_id, parse_timedelta, quote, search_string, unquote
+from .utils import parse_datetime, parse_id, parse_timedelta, quote, search_string
 
 
 DEFAULT_PERIOD = "1h"
@@ -52,12 +53,11 @@ def index():
 
 @app.route("/metric/<path:metric_id>/")
 def metric(metric_id):
-    # one level of quoting got removed by Flask
-    base_name, tags = parse_id(quote(metric_id))
+    base_name, tags = parse_id(metric_id)
     style = get_metric_style(metric_id)
     return render_template(
         "metric.html",
-        metric_id=metric_id,
+        metric_id=no_slash_quote(metric_id),
         base_name=base_name,
         tags=tags,
         period=get_request_arg('period', None),
@@ -69,14 +69,13 @@ def metric(metric_id):
 
 @app.route("/metricdata/<path:metric_id>/")
 def metric_data(metric_id):
-    # one level of quoting got removed by Flask
     base_name, tags = parse_id(metric_id)
     style = get_metric_style(metric_id)
     return jsonify(
         **backend.metric(
             base_name,
             tags,
-            display_name=style.get('short_name', metric_id),
+            display_name=style.get('short_name', base_name),
             period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
             resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
             start=parse_datetime(get_request_arg('start', None)),
