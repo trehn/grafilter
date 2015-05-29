@@ -5,7 +5,7 @@ from flask import Flask, jsonify, render_template, request, Response
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
-from .utils import parse_datetime, parse_timedelta, quote, search_string, unquote
+from .utils import parse_datetime, parse_id, parse_timedelta, quote, search_string, unquote
 
 
 DEFAULT_PERIOD = "1h"
@@ -50,16 +50,16 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/metric/<metric_urlsafe>/")
-def metric(metric_urlsafe):
-    metric = unquote(metric_urlsafe)
+@app.route("/metric/<path:metric_id>/")
+def metric(metric_id):
     # one level of quoting got removed by Flask
-    metric_urlsafe = quote(metric)
-    style = get_metric_style(metric)
+    base_name, tags = parse_id(quote(metric_id))
+    style = get_metric_style(metric_id)
     return render_template(
         "metric.html",
-        metric=metric,
-        metric_urlsafe=metric_urlsafe,
+        metric_id=metric_id,
+        base_name=base_name,
+        tags=tags,
         period=get_request_arg('period', None),
         resolution=int(get_request_arg('resolution', 0)),
         start=get_request_arg('start', None),
@@ -67,14 +67,16 @@ def metric(metric_urlsafe):
     )
 
 
-@app.route("/metricdata/<metric_urlsafe>/")
-def metric_data(metric_urlsafe):
-    metric = unquote(metric_urlsafe)
-    style = get_metric_style(metric)
+@app.route("/metricdata/<path:metric_id>/")
+def metric_data(metric_id):
+    # one level of quoting got removed by Flask
+    base_name, tags = parse_id(metric_id)
+    style = get_metric_style(metric_id)
     return jsonify(
         **backend.metric(
-            metric,
-            display_name=style.get('short_name', metric),
+            base_name,
+            tags,
+            display_name=style.get('short_name', metric_id),
             period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
             resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
             start=parse_datetime(get_request_arg('start', None)),
@@ -89,13 +91,17 @@ def metric_search():
     result = []
     with cache.lock:
         metrics = cache['metrics']
+    columns = set()
     for metric, metric_properties in metrics.items():
         if search_string(query, metric):
             result.append({
-                'name': metric,
-                'name_urlsafe': metric_properties['name_urlsafe'],
+                'base_name': metric_properties['base_name'],
+                'id': metric,
                 'styled': metric_properties['styled'],
+                'tags': metric_properties['tags'],
             })
+            columns.update(metric_properties['tags'].keys())
+    result.insert(0, sorted(columns))
     return Response(json.dumps(result), mimetype="application/json")
 
 

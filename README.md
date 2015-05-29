@@ -3,6 +3,8 @@ grafilter
 
 Dashboards like [Grafana](http://grafana.org) are awesome, but sometimes they make it hard to look at all the metrics, without first spending time to configure a dashboard. Grafilter is meant to provide lightweight and easy access to your metrics. You can still customize visuals of course, but in a way that let's you store these customizations in a versioned config management system such as [Ansible](http://www.ansible.com), [BundleWrap](http://bundlewrap.org) or [Chef](https://www.chef.io/chef/) as opposed to a database like Grafana 2 does.
 
+Grafilter supports InfluxDB 0.9.0 and onwards.
+
 ![PyPI downloads](http://img.shields.io/pypi/dm/grafilter.svg) &nbsp; ![PyPI version](http://img.shields.io/pypi/v/grafilter.svg) &nbsp; ![Python 3.x](http://img.shields.io/badge/Python-3.4-green.svg) &nbsp; ![License](http://img.shields.io/badge/License-GPLv3-red.svg)
 
 Install
@@ -19,11 +21,12 @@ Configure
 Create a file with these contents anywhere:
 
 ```python
-DEBUG = False
 CACHE_TIMEOUT = 300
 CONFIG_DIR = "/var/lib/grafilter"
-INFLUXDB_URL = "http://user:pass@influxdb.example.com:8086"
+DEBUG = False
+IGNORED_TAGS = ["_id"]
 INFLUXDB_DB = "metrics"
+INFLUXDB_URL = "http://user:pass@influxdb.example.com:8086"
 ```
 
 Note that `INFLUXDB_URL` points to the HTTP API port of InfluxDB.

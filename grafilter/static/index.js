@@ -14,18 +14,33 @@ $(document).ready(function() {
 	});
 
 	function display_results(datums) {
-		if (datums.length >= 1) {
-			var output = "<table class='ui compact table'>";
-			datums.map(function(datum) {
+		if (datums.length > 1) {
+			var output = "<table class='ui compact table'><thead><tr>";
+			output += "<th></th><th>Metric</th>";
+			datums[0].map(function(column) {
+				output += "<th>" + column + "</th>";
+			});
+			output += "</tr></thead><tbody>";
+			var length = datums.length;
+			for (var i = 1; i < length; i++) {
+				var datum = datums[i];
 				output += "<tr><td class='collapsing'>";
 				if (datum.styled) {
 					output += "<div class='ui circular label' title='Styled'>S</div>";
 				}
 				output += "</td><td>";
-				output += "<a href='/metric/" + datum.name_urlsafe + "/'>";
-				output += datum.name + "</a></td></tr>";
-			})
-			output += "</table>";
+				output += "<a href='/metric/" + datum.id + "/'>";
+				output += datum.base_name + "</a></td>";
+				datums[0].map(function(column) {
+					if (datum.tags[column] === undefined) {
+						output += "<td></td>";
+					} else {
+						output += "<td>" + datum.tags[column] + "</td>";
+					}
+				});
+				output += "</tr>";
+			}
+			output += "</tbody></table>";
 			$("#results").html(output);
 		}
 		else {
@@ -34,7 +49,7 @@ $(document).ready(function() {
 	}
 
 	$("#search").keydown(function(event) {
-		var rows = $("tr");
+		var rows = $("tbody tr");
 		if (event.which == 13 && selected_row) {
 			window.location = selected_row.find("a")[0].href;
 		}

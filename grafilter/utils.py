@@ -7,6 +7,24 @@ from parsedatetime import Calendar
 calendar = Calendar()
 
 
+def build_id(base_name, tag_dict):
+    """
+    Turns a metric name and a dict of tags into a canonical name for
+    that series.
+
+    base_name: "cpu_load"
+    tag_dict: {'host': "foo.example.com", 'region': "us-west"}
+
+    becomes
+
+    "cpu_load/host:foo.example.com/region:us-west"
+    """
+    result = quote(base_name)
+    for key in sorted(tag_dict.keys()):
+        result += "/{}:{}".format(quote(key), quote(str(tag_dict[key])))
+    return result
+
+
 def quote(s):
     # https://github.com/mitsuhiko/flask/issues/900
     # http://www.leakon.com/archives/865
@@ -21,6 +39,19 @@ def parse_datetime(s):
     if not s:
         return None
     return calendar.parseDT(s, sourceTime=datetime.now(timezone.utc), tzinfo=timezone.utc)[0]
+
+
+def parse_id(metric_id):
+    """
+    This is the reverse of build_id().
+    """
+    tokens = metric_id.split("/")
+    base_name = tokens.pop(0)
+    tags = {}
+    for token in tokens:
+        key, value = token.split(":", 1)
+        tags[unquote(key)] = unquote(value)
+    return base_name, tags
 
 
 def parse_timedelta(s):

@@ -5,8 +5,6 @@ import math
 from os.path import join
 import re
 
-from .utils import quote
-
 
 def apply_metric_customizations(cache, config_dir):
     for filename in glob(join(config_dir, "metrics", "*.json")):
@@ -29,9 +27,10 @@ def build_cache(backend, config_dir):
         'metrics': OrderedDict(),
         'styles': {},
     }
-    for metric in backend.metrics():
+    for metric, metric_meta in backend.metrics():
         cache['metrics'][metric] = {
-            'name_urlsafe': quote(metric),
+            'base_name': metric_meta['base_name'],
+            'tags': metric_meta['tags'],
             'styled': False,
         }
     apply_metric_customizations(cache, config_dir)
