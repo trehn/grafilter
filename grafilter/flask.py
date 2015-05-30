@@ -6,7 +6,8 @@ from flask import Flask, jsonify, render_template, request, Response
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
-from .utils import parse_datetime, parse_id, parse_timedelta, quote, search_string
+from .utils import build_reduced_ids, parse_datetime, parse_id, parse_timedelta, quote, \
+    search_string
 
 
 DEFAULT_PERIOD = "1h"
@@ -60,6 +61,7 @@ def metric(metric_id):
         metric_id=no_slash_quote(metric_id),
         base_name=base_name,
         tags=tags,
+        reduced_ids=build_reduced_ids(base_name, tags),
         period=get_request_arg('period', None),
         resolution=int(get_request_arg('resolution', 0)),
         start=get_request_arg('start', None),

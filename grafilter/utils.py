@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import datetime, timezone
 from urllib.parse import quote_plus, unquote_plus
 
@@ -22,6 +23,18 @@ def build_id(base_name, tag_dict):
     result = quote(base_name)
     for key in sorted(tag_dict.keys()):
         result += "/{}:{}".format(quote(key), quote(str(tag_dict[key])))
+    return result
+
+
+def build_reduced_ids(base_name, tag_dict):
+    """
+    Returns a dict mapping tag keys to metric IDs without that tag.
+    """
+    result = {}
+    for key in tag_dict.keys():
+        reduced_tag_dict = copy(tag_dict)
+        del reduced_tag_dict[key]
+        result[key] = build_id(base_name, reduced_tag_dict)
     return result
 
 
