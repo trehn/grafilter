@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import requests
 
-from .utils import build_id
+from .utils import build_id, simplify_keys
 
 
 class InfluxDBBackend(object):
@@ -40,7 +40,6 @@ class InfluxDBBackend(object):
         self,
         base_name,
         tags,
-        display_name=None,
         period=None,
         resolution=80,
         start=None,
@@ -66,7 +65,7 @@ class InfluxDBBackend(object):
             params={
                 'db': self._config['INFLUXDB_DB'],
                 'q': "SELECT mean(value) from \"{base_name}\" "
-                     "WHERE {timespec}{tag_filter} GROUP BY time({tick}s)".format(
+                     "WHERE {timespec}{tag_filter} GROUP BY time({tick}s), *".format(
                     base_name=base_name,
                     tag_filter=tag_filter,
                     timespec=timespec,
@@ -74,16 +73,24 @@ class InfluxDBBackend(object):
                 ),
             },
         )
+        series_list = response.json()['results'][0]['series']
+        data = {}
 
-        raw_points = response.json()['results'][0]['series'][0]['values']
-        data = {
-            'x': [],
-            display_name: [],
-        }
-        for time, value in raw_points:
-            data['x'].append(int(datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000))
+        for series in series_list:
+            series_id = build_id(series['name'], series['tags'])
+            data[series_id] = []
             if transform is None:
-                data[display_name].append(value)
+                for time, value in series['values']:
+                    data[series_id].append(value)
             else:
-                data[display_name].append(transform(value))
+                for time, value in series['values']:
+                    data[series_id].append(transform(value))
+
+        simplify_keys(data)
+
+        data['x'] = [
+            int(datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000)
+            for time, value in series_list[0]['values']
+        ]
+
         return data

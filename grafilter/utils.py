@@ -80,3 +80,56 @@ def search_string(query, candidate):
         if token not in candidate:
             return False
     return True
+
+
+def simplify_keys(d):
+    """
+    Given a dictionary with metric IDs as keys, this will try to trim
+    down the keys as much as possible by removing information present
+    in all keys. Will modify the dictionary in place.
+
+    input: {
+        "foo/bar:baz/crackle:pop": None,
+        "foo/bar:wiggle/crackle:snap": None,
+    }
+
+    output: {
+        "baz pop": None,
+        "wiggle snap": None,
+    }
+    """
+    base_names = {}
+    normalized_keys = {}
+    for key in sorted(d.keys()):
+        base_name, tags = parse_id(key)
+        tags[""] = base_name
+        base_names[key] = base_name
+        normalized_keys[key] = tags
+
+    keys_to_remove = set()
+
+    for key, tags in normalized_keys.items():
+        for tag, value in tags.items():
+            found_mismatch = False
+            for _, candidate_tags in normalized_keys.items():
+                if candidate_tags[tag] != value:
+                    found_mismatch = True
+                    break
+            if not found_mismatch:
+                keys_to_remove.add(tag)
+
+    for tags in normalized_keys.values():
+        for key in keys_to_remove:
+            try:
+                del tags[key]
+            except KeyError:
+                pass
+
+    for original_key, tags in normalized_keys.items():
+        new_key = ""
+        for key in sorted(tags.keys()):
+            new_key += tags[key] + " "
+        new_key = new_key.strip()
+        if not new_key:
+            new_key = base_names[original_key]
+        d[new_key] = d.pop(original_key)
