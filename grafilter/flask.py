@@ -6,8 +6,7 @@ from flask import Flask, jsonify, render_template, request, Response
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
-from .utils import build_reduced_ids, parse_datetime, parse_id, parse_timedelta, quote, \
-    search_string
+from .utils import build_reduced_ids, parse_datetime, parse_id, parse_timedelta, search_string
 
 
 DEFAULT_PERIOD = "1h"
