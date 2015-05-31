@@ -1,3 +1,12 @@
+0.2.1
+=====
+
+2015-05-31
+
+* search is now case-insensitive
+* sorted tags in metrics view
+
+
 0.2.0
 =====
 
