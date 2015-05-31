@@ -3,6 +3,7 @@ from urllib.parse import quote as no_slash_quote
 
 from flask import Flask, jsonify, render_template, request, Response
 
+from . import VERSION_STRING
 from .background import Cache
 from .cache import build_cache
 from .influxdb import InfluxDBBackend
@@ -48,7 +49,7 @@ def get_metric_style(metric):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", version=VERSION_STRING)
 
 
 @app.route("/metric/<path:metric_id>/")
