@@ -59,7 +59,7 @@ def metric(metric_id):
         "metric.html",
         metric_id=no_slash_quote(metric_id),
         base_name=base_name,
-        tags=tags,
+        tags=sorted((key, value) for key, value in tags.items()),
         reduced_ids=build_reduced_ids(base_name, tags),
         period=get_request_arg('period', None),
         resolution=int(get_request_arg('resolution', 0)),

@@ -11,7 +11,7 @@
 						<i class="right chevron icon divider"></i>
 						<div class="active section">
 							{% if "short_name" in style %}<span title="{{ base_name }}">{{ style["short_name"] }}</span>{% else %}{{ base_name }}{% endif %}
-							{% for key, value in tags.items() %}
+							{% for key, value in tags %}
 							<a title="click to remove this filter" href="/metric/{{ reduced_ids[key] }}">&nbsp; <small>{{ key }}:</small> {{ value }}</a>
 							{% endfor %}
 						</div>
