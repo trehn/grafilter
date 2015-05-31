@@ -19,7 +19,7 @@ class InfluxDBBackend(object):
         )
         result = []
         response_json = response.json()['results'][0]
-        for series in response_json['series']:
+        for series in response_json.get('series', []):
             for tag_values in series['values']:
                 tag_dict = dict(zip(series['columns'], tag_values))
                 for ignored_tag in self._config['IGNORED_TAGS']:
