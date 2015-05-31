@@ -77,7 +77,7 @@ class InfluxDBBackend(object):
         data = {}
 
         for series in series_list:
-            series_id = build_id(series['name'], series['tags'])
+            series_id = build_id(series['name'], series.get('tags', {}))
             data[series_id] = []
             if transform is None:
                 for time, value in series['values']:
