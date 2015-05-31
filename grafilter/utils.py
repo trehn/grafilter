@@ -76,8 +76,9 @@ def parse_timedelta(s):
 
 
 def search_string(query, candidate):
+    candidate = candidate.lower()
     for token in query.split():
-        if token not in candidate:
+        if token.lower() not in candidate:
             return False
     return True
 
