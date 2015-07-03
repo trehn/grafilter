@@ -40,6 +40,6 @@ setup(
     name="grafilter",
     packages=find_packages(),
     url="https://github.com/trehn/grafilter",
-    version="0.3.0",
+    version="0.3.1",
     zip_safe=False,
 )

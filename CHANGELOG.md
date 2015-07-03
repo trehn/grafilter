@@ -1,3 +1,11 @@
+0.3.1
+=====
+
+2015-07-03
+
+* reverts backwards incompatible changes from 0.3.0
+
+
 0.3.0
 =====
 
