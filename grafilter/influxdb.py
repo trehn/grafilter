@@ -43,8 +43,11 @@ class InfluxDBBackend(object):
         period=None,
         resolution=80,
         start=None,
+        merge=None,
         transform=None,
     ):
+        if merge is not None:
+            resolution += 1
         if period is None:
             period = timedelta(3600)
         if start is not None:
@@ -60,6 +63,8 @@ class InfluxDBBackend(object):
         for key, value in tags.items():
             tag_filter += " and \"{}\" = '{}'".format(key, value)
 
+        tick = int(period.total_seconds() / resolution)
+
         response = requests.get(
             self._config['INFLUXDB_URL'] + "/query",
             params={
@@ -69,7 +74,7 @@ class InfluxDBBackend(object):
                     base_name=base_name,
                     tag_filter=tag_filter,
                     timespec=timespec,
-                    tick=int(period.total_seconds() / resolution),
+                    tick=tick,
                 ),
             },
         )
@@ -79,11 +84,16 @@ class InfluxDBBackend(object):
         for series in series_list:
             series_id = build_id(series['name'], series.get('tags', {}))
             data[series_id] = []
-            if transform is None:
-                for time, value in series['values']:
+            prev_value = None
+            for time, value in series['values']:
+                if merge is not None and value is not None:
+                    if prev_value is None:
+                        prev_value = value
+                        continue
+                    prev_value, value = value, merge(prev_value, value, tick)
+                if transform is None:
                     data[series_id].append(value)
-            else:
-                for time, value in series['values']:
+                else:
                     data[series_id].append(transform(value))
 
         simplify_keys(data)

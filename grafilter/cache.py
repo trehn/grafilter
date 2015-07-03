@@ -12,6 +12,11 @@ def apply_metric_customizations(cache, config_dir):
             json = loads(f.read())
         pattern = re.compile(json['pattern'])
         cache['styles'][pattern] = json
+        if cache['styles'][pattern].get('merge', None) is not None:
+            cache['styles'][pattern]['merge'] = eval(
+                cache['styles'][pattern]['merge'],
+                {'math': math},
+            )
         if cache['styles'][pattern].get('transform', None) is not None:
             cache['styles'][pattern]['transform'] = eval(
                 cache['styles'][pattern]['transform'],

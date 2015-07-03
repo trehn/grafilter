@@ -80,6 +80,7 @@ def metric_data(metric_id):
             period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
             resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
             start=parse_datetime(get_request_arg('start', None)),
+            merge=style.get('merge', None),
             transform=style.get('transform', None),
         )
     )
