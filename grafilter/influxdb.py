@@ -91,7 +91,7 @@ class InfluxDBBackend(object):
                         prev_value = value
                         continue
                     prev_value, value = value, merge(prev_value, value, tick)
-                if transform is None:
+                if transform is None or value is None:
                     data[series_id].append(value)
                 else:
                     data[series_id].append(transform(value))
