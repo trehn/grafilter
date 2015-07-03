@@ -56,6 +56,20 @@ def index():
 def metric(metric_id):
     base_name, tags = parse_id(metric_id)
     style = get_metric_style(metric_id)
+    if style.get('stack', False):
+        columns = list(backend.metric(
+            base_name,
+            tags,
+            period=parse_timedelta(get_request_arg('period', DEFAULT_PERIOD)),
+            resolution=int(get_request_arg('resolution', DEFAULT_RESOLUTION)),
+            start=parse_datetime(get_request_arg('start', None)),
+            merge=None,
+            transform=None,
+        ).keys())
+        columns.remove('x')
+        columns = json.dumps([columns])
+    else:
+        columns = None
     return render_template(
         "metric.html",
         metric_id=no_slash_quote(metric_id),
@@ -66,6 +80,7 @@ def metric(metric_id):
         resolution=int(get_request_arg('resolution', 0)),
         start=get_request_arg('start', None),
         style=style,
+        columns=columns,
     )
 
 

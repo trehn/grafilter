@@ -59,6 +59,7 @@ Option | Explanation
 `merge` | a Python expression describing a function that takes two numeric values and the time interval between them and returns one numeric value. It can be used to calculate the difference between two sequential datapoints and use the result in your graph (useful for ever increasing counters, e.g. `lambda x, y, t: (y - x) / t`). You have access to the [math module from the Python standard library](https://docs.python.org/3/library/math.html). Applied before `transform`.
 `min` | force lowest value on y axis (int or float)
 `short_name` | a cosmetic name for this metric, e.g. "Load Average"
+`stack` | set this to `true` if you want to stack values when selecting multiple metrics
 `transform` | a Python expression describing a function that takes a numeric value and returns another. It can be used to perform conversions and other math on your metrics. You have access to the [math module from the Python standard library](https://docs.python.org/3/library/math.html). Applied after `merge`.
 `type` | chart type: `area`, `area-spline`, `area-step`, `line`, `spline` or `step` (defaults to `line`)
 `unit_format` | a [d3 format specifier](https://github.com/mbostock/d3/wiki/Formatting#d3_format) for your y axis (e.g. "s" to turn "1000" into "1K" and "1000000" into "1M")

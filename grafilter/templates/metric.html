@@ -51,6 +51,9 @@
 					x: 'x',
 					url: '/metricdata/{{ metric_id }}/' + location.search,
 					mimeType: 'json',
+					{% if style.get('stack', False) %}
+					groups: {{ columns|safe }},
+					{% endif %}
 					type: '{{ style.get('type', 'line') }}'
 				},
 				axis: {
