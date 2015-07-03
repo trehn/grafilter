@@ -1,3 +1,12 @@
+0.3.0
+=====
+
+2015-07-03
+
+* now uses line protocol metric name for pattern matching (BACKWARDS INCOMPATIBLE)
+* added `merge` option
+
+
 0.2.1
 =====
 
