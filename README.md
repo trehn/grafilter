@@ -45,13 +45,13 @@ You can customize the appearance of your individual metrics by placing files in 
 
 ```json
 {
-	"pattern": "\\.load$",
+	"pattern": "^load/",
 	"transform": "lambda x: math.floor(x)",
 	"type": "area"
 }
 ```
 
-Note that `pattern` is a regular expression that has to match the name of the metrics you want to customize. Each metric will only be styled according to the first file with a matching `pattern`. All other options listed here are optional.
+Note that `pattern` is a regular expression that has to match the name of the metrics you want to customize. The name is formatted like this: `measurement/tag1:value1/tag2:value2`. Each metric will only be styled according to the first file with a matching `pattern`. All other options listed here are optional.
 
 Option | Explanation
 -------|------------
