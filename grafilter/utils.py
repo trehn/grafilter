@@ -18,11 +18,11 @@ def build_id(base_name, tag_dict):
 
     becomes
 
-    "cpu_load,host=foo.example.com,region=us-west"
+    "cpu_load/host:foo.example.com/region:us-west"
     """
     result = quote(base_name)
     for key in sorted(tag_dict.keys()):
-        result += ",{}={}".format(quote(key), quote(str(tag_dict[key])))
+        result += "/{}:{}".format(quote(key), quote(str(tag_dict[key])))
     return result
 
 
