@@ -24,7 +24,7 @@ Create a file with these contents anywhere:
 CACHE_TIMEOUT = 300
 CONFIG_DIR = "/var/lib/grafilter"
 DEBUG = False
-IGNORED_TAGS = ["_id"]
+IGNORED_TAGS = ["_key"]
 INFLUXDB_DB = "metrics"
 INFLUXDB_URL = "http://user:pass@influxdb.example.com:8086"
 ```
