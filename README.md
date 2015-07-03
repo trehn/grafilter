@@ -51,7 +51,7 @@ You can customize the appearance of your individual metrics by placing files in 
 }
 ```
 
-Note that `pattern` is a regular expression that has to match the name of the metrics you want to customize. Each metric will only be styled according to the first file with a matching `pattern`. All other options listed here are optional.
+Note that `pattern` is a regular expression that has to match the [line protocol](https://influxdb.com/docs/v0.9/write_protocols/line.html)-style name of the metrics you want to customize (e.g. `measurement,tag1=value1,tag2=value2`). Each metric will only be styled according to the first file with a matching `pattern`. All other options listed here are optional.
 
 Option | Explanation
 -------|------------
